@@ -39,7 +39,7 @@
 
             <!-- Search Input -->
             <div class="relative w-full md:w-[450px]">
-                <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 0 0114 0z"/></svg>
                 <input type="text" placeholder="Search product" class="w-full pl-10 pr-16 py-2.5 bg-[#F6F7F9] border-0 rounded-full text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#F05423] placeholder-gray-400">
                 <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-bold text-gray-400 bg-white px-2 py-0.5 rounded-md border border-gray-200">
                     K <span class="text-[9px]">⤢</span>
@@ -48,15 +48,17 @@
 
             <!-- Notifications & Profile -->
             <div class="flex items-center gap-3">
-                <button class="w-9 h-9 rounded-full bg-[#F6F7F9] flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all text-sm relative">
+                <!-- Notification Bell with Low Stock Alert Count -->
+                <a href="#low-stock-section" class="w-9 h-9 rounded-full bg-[#F6F7F9] flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all text-sm relative">
                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span class="w-2 h-2 bg-[#F05423] rounded-full absolute top-2 right-2"></span>
-                </button>
-                <button class="w-9 h-9 rounded-full bg-[#F6F7F9] flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all text-sm">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </button>
+                    @if($lowStockCount > 0)
+                        <span class="absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                            {{ $lowStockCount }}
+                        </span>
+                    @endif
+                </a>
 
-                <!-- Admin Profile Card (Clickable to Edit Profile) -->
+                <!-- Admin Profile Card -->
                 <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 bg-[#F6F7F9] hover:bg-gray-200 pl-1.5 pr-3 py-1 rounded-full ml-1 transition-all">
                     @if(auth()->user()->avatar)
                         <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-8 h-8 rounded-full object-cover">
@@ -157,13 +159,13 @@
             <!-- RIGHT MAIN PANEL -->
             <main class="lg:col-span-10 space-y-6">
                 
-                <!-- TITLE & DATE PICKER -->
+                <!-- TITLE & DYNAMIC DATE PICKER DISPLAY -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Sales Overview</h1>
                     
                     <div class="flex items-center gap-2 bg-[#F6F7F9] px-4 py-2 rounded-full text-xs font-semibold text-gray-700">
                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span>April 10, 2026 – May 11, 2026</span>
+                        <span>{{ $startDate }} – {{ $endDate }}</span>
                         <span class="text-gray-400 ml-1">▾</span>
                     </div>
                 </div>
@@ -179,10 +181,10 @@
                             </div>
                         </div>
                         <div class="mt-3 flex items-baseline gap-2">
-                            <span class="text-2xl font-extrabold text-gray-900">2500</span>
-                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">↑ 4.9%</span>
+                            <span class="text-2xl font-extrabold text-gray-900">{{ $totalSalesCount }}</span>
+                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">This Month</span>
                         </div>
-                        <div class="mt-2 text-[11px] text-gray-400">Last month: <span class="font-semibold text-gray-600">2345</span></div>
+                        <div class="mt-2 text-[11px] text-gray-400">Processed Orders</div>
                     </div>
 
                     <!-- Card 2 -->
@@ -200,19 +202,23 @@
                         <div class="mt-2 text-[11px] text-gray-400">Last month: <span class="font-semibold text-gray-600">89</span></div>
                     </div>
 
-                    <!-- Card 3 -->
+                    <!-- Card 3: Low Stock Warning Stat Card -->
                     <div class="bg-[#F6F7F9] p-5 rounded-[24px]">
                         <div class="flex justify-between items-start">
-                            <span class="text-xs font-medium text-gray-500">Return Products</span>
+                            <span class="text-xs font-medium text-gray-500">Low Stock Alert</span>
                             <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-xs shadow-sm">
-                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                             </div>
                         </div>
                         <div class="mt-3 flex items-baseline gap-2">
-                            <span class="text-2xl font-extrabold text-gray-900">72</span>
-                            <span class="text-[10px] font-bold text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded-md">↓ 6.0%</span>
+                            <span class="text-2xl font-extrabold text-rose-600">{{ $lowStockCount }} Items</span>
+                            @if($lowStockCount > 0)
+                                <span class="text-[10px] font-bold text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded-md">Action Required</span>
+                            @else
+                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">Stock Healthy</span>
+                            @endif
                         </div>
-                        <div class="mt-2 text-[11px] text-gray-400">Last month: <span class="font-semibold text-gray-600">60</span></div>
+                        <div class="mt-2 text-[11px] text-gray-400">Products with stock <= 5</div>
                     </div>
 
                     <!-- Card 4 -->
@@ -222,22 +228,69 @@
                             <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-xs shadow-sm font-bold text-gray-600">$</div>
                         </div>
                         <div class="mt-3">
-                            <span class="text-2xl font-extrabold text-gray-900">$8,220.64</span>
+                            <span class="text-2xl font-extrabold text-[#F05423]">${{ number_format($totalRevenue, 2) }}</span>
                         </div>
-                        <div class="mt-2 text-[11px] text-gray-400">Last month: <span class="font-semibold text-gray-600">$620.00</span></div>
+                        <div class="mt-2 text-[11px] text-gray-400">Current Month Total</div>
                     </div>
                 </div>
 
-                <!-- RECENT ORDERS TABLE -->
+                <!-- STEP 13: LOW STOCK WARNING TABLE (WIDGET) -->
+                @if($lowStockCount > 0)
+                    <div id="low-stock-section" class="bg-rose-50 border border-rose-200 p-6 rounded-[28px] space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-rose-700 font-extrabold text-sm">
+                                <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                Low Stock Inventory Alert
+                            </div>
+                            <a href="{{ route('admin.products.index') }}" class="text-xs font-bold text-rose-700 hover:underline">
+                                Update Inventory Stock →
+                            </a>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-gray-700">
+                                <thead class="text-rose-400 text-[11px] border-b border-rose-200 pb-2">
+                                    <tr>
+                                        <th class="pb-2">Product Name</th>
+                                        <th class="pb-2">SKU</th>
+                                        <th class="pb-2">Price</th>
+                                        <th class="pb-2">Remaining Stock</th>
+                                        <th class="pb-2 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-rose-200/60 font-semibold">
+                                    @foreach($lowStockProducts as $lowProduct)
+                                        <tr>
+                                            <td class="py-2.5 font-bold text-gray-900">{{ $lowProduct->name }}</td>
+                                            <td class="py-2.5 text-gray-500 font-mono">{{ $lowProduct->sku }}</td>
+                                            <td class="py-2.5 font-extrabold">${{ number_format($lowProduct->price, 2) }}</td>
+                                            <td class="py-2.5">
+                                                <span class="{{ $lowProduct->stock == 0 ? 'bg-rose-600 text-white' : 'bg-rose-200 text-rose-800' }} px-2 py-0.5 rounded-full text-[10px] font-bold">
+                                                    {{ $lowProduct->stock == 0 ? 'Out of Stock' : $lowProduct->stock . ' units left' }}
+                                                </span>
+                                            </td>
+                                            <td class="py-2.5 text-right">
+                                                <a href="{{ route('admin.products.edit', $lowProduct->id) }}" class="bg-white px-2.5 py-1 rounded-xl text-[11px] font-bold text-rose-700 border border-rose-200 hover:bg-rose-100">
+                                                    Restock
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- RECENT ORDERS TABLE (DYNAMIC REAL-TIME) -->
                 <div class="bg-[#F6F7F9] p-6 rounded-[28px]">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
                         <h3 class="font-bold text-gray-900 text-sm">Recent orders</h3>
                         
                         <div class="flex items-center gap-3 w-full sm:w-auto">
-                            <div class="relative flex-1 sm:flex-initial">
-                                <svg class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                <input type="text" placeholder="Search" class="w-full bg-white border-0 py-1.5 pl-8 pr-4 rounded-full text-xs placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#F05423]">
-                            </div>
+                            <a href="{{ route('admin.sales.index') }}" class="text-xs font-bold text-[#F05423] hover:underline">
+                                View All Orders →
+                            </a>
                         </div>
                     </div>
 
@@ -246,29 +299,39 @@
                         <table class="w-full text-left text-xs text-gray-600">
                             <thead class="text-gray-400 text-[11px] border-b border-gray-200 pb-2">
                                 <tr>
-                                    <th class="pb-3 px-2"><input type="checkbox" class="rounded border-gray-300 text-[#F05423]"></th>
                                     <th class="pb-3">Order Id</th>
-                                    <th class="pb-3">Date</th>
-                                    <th class="pb-3">Customer</th>
-                                    <th class="pb-3">Category</th>
-                                    <th class="pb-3">Status</th>
+                                    <th class="pb-3">Date & Time</th>
+                                    <th class="pb-3">Cashier Staff</th>
+                                    <th class="pb-3">Payment</th>
                                     <th class="pb-3">Items</th>
                                     <th class="pb-3 text-right">Total</th>
+                                    <th class="pb-3 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200/60 font-medium">
-                                <tr>
-                                    <td class="py-3 px-2"><input type="checkbox" class="rounded border-gray-300 text-[#F05423]"></td>
-                                    <td class="py-3 font-bold text-gray-900">#878909</td>
-                                    <td class="py-3 text-gray-500">2 Dec 2026</td>
-                                    <td class="py-3 font-bold text-gray-900">Oliver John Brown</td>
-                                    <td class="py-3 text-gray-500">Shoes, Shirt</td>
-                                    <td class="py-3">
-                                        <span class="bg-rose-100 text-rose-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold">Pending</span>
-                                    </td>
-                                    <td class="py-3 text-gray-500">2 Items</td>
-                                    <td class="py-3 text-right font-extrabold text-gray-900">$789.00</td>
-                                </tr>
+                                @forelse($recentOrders as $order)
+                                    <tr>
+                                        <td class="py-3 font-bold text-gray-900">{{ $order->order_number }}</td>
+                                        <td class="py-3 text-gray-500">{{ $order->created_at->format('d M Y, h:i A') }}</td>
+                                        <td class="py-3 font-bold text-gray-900">{{ $order->user->name ?? 'Staff' }}</td>
+                                        <td class="py-3">
+                                            <span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">
+                                                {{ $order->payment_method }}
+                                            </span>
+                                        </td>
+                                        <td class="py-3 text-gray-500">{{ $order->items->sum('quantity') }} Items</td>
+                                        <td class="py-3 text-right font-extrabold text-[#F05423]">${{ number_format($order->total, 2) }}</td>
+                                        <td class="py-3 text-right">
+                                            <a href="{{ route('admin.sales.show', $order->id) }}" class="bg-white border border-gray-200 px-2.5 py-1 rounded-xl text-[11px] font-bold text-gray-700 hover:bg-gray-100">
+                                                Receipt
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-6 text-gray-400 font-semibold">No recent orders found. Open POS Terminal to process sales!</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

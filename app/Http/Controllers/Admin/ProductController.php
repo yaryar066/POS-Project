@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -29,21 +30,28 @@ class ProductController extends Controller
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name'        => 'required|string|max:255',
-            'sku'         => 'required|string|max:100|unique:products,sku',
+            'sku'         => 'nullable|string|max:100|unique:products,sku',
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
+        // Auto Generate SKU / Barcode if left empty
+        if (empty($validated['sku'])) {
+            do {
+                $generatedSku = 'PRD-' . strtoupper(Str::random(8));
+            } while (Product::where('sku', $generatedSku)->exists());
+            
+            $validated['sku'] = $generatedSku;
+        }
+
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
-        $validated['is_active'] = $request->has('is_active');
-
         Product::create($validated);
 
-        return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Product created with Barcode successfully.');
     }
 
     public function edit(Product $product): View
@@ -69,8 +77,6 @@ class ProductController extends Controller
             }
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
-
-        $validated['is_active'] = $request->has('is_active');
 
         $product->update($validated);
 

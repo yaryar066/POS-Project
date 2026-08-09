@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\View\View;
 
@@ -11,22 +12,34 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $totalUsers = User::count();
-        $totalAdmins = User::where('role', 'admin')->count();
-        $totalStaff = User::where('role', 'staff')->count();
+        // Dynamic Current Month Date Range
+        $startDate = now()->startOfMonth()->format('F j, Y');
+        $endDate = now()->endOfMonth()->format('F j, Y');
 
-        $totalCategories = Category::count();
-        $activeCategories = Category::where('is_active', true)->count();
+        // Dynamic Real-Time Calculations
+        $totalSalesCount = Order::whereMonth('created_at', now()->month)
+                                ->whereYear('created_at', now()->year)
+                                ->count();
 
-        $recentUsers = User::latest()->take(5)->get();
+        $totalRevenue = Order::whereMonth('created_at', now()->month)
+                             ->whereYear('created_at', now()->year)
+                             ->sum('total');
+
+        // Real-Time Recent Orders (Latest 5 Orders)
+        $recentOrders = Order::with(['user', 'items'])->latest()->take(5)->get();
+
+        // Step 13: Low Stock Products (Stock <= 5)
+        $lowStockProducts = Product::where('stock', '<=', 5)->where('is_active', true)->get();
+        $lowStockCount = $lowStockProducts->count();
 
         return view('admin.dashboard', compact(
-            'totalUsers',
-            'totalAdmins',
-            'totalStaff',
-            'totalCategories',
-            'activeCategories',
-            'recentUsers'
+            'startDate',
+            'endDate',
+            'totalSalesCount',
+            'totalRevenue',
+            'recentOrders',
+            'lowStockProducts',
+            'lowStockCount'
         ));
     }
 }
