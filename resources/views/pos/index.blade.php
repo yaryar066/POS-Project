@@ -22,7 +22,7 @@
 
             <div class="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                Barcode Scanner & Loyalty Active
+                Barcode Scanner, Loyalty & Rating Active
             </div>
         </div>
 
@@ -85,8 +85,8 @@
             <!-- RIGHT CART & CHECKOUT AREA (5 COLS) -->
             <div class="lg:col-span-5 bg-[#F6F7F9] p-6 rounded-[28px] flex flex-col justify-between space-y-4">
                 <div>
-                    <!-- CUSTOMER LOYALTY SEARCH / SELECT MODULE -->
-                    <div class="bg-white p-3 rounded-2xl mb-4 border border-gray-100 space-y-2">
+                    <!-- CUSTOMER LOYALTY MODULE -->
+                    <div class="bg-white p-3 rounded-2xl mb-3 border border-gray-100 space-y-2">
                         <div class="flex justify-between items-center text-xs font-bold text-gray-900">
                             <span>Customer Loyalty Profile</span>
                             <button onclick="createNewCustomer()" class="text-[10px] text-[#F05423] font-extrabold hover:underline">+ New Customer</button>
@@ -104,18 +104,18 @@
                         </div>
                     </div>
 
-                    <h3 class="font-extrabold text-gray-900 text-sm mb-3">Current Order Cart</h3>
+                    <h3 class="font-extrabold text-gray-900 text-sm mb-2">Current Order Cart</h3>
                     
                     <!-- Cart Items Container -->
-                    <div id="cartItems" class="space-y-3 overflow-y-auto max-h-[220px] pr-1">
-                        <div class="text-center py-8 text-gray-400 text-xs font-semibold" id="emptyCartMsg">
+                    <div id="cartItems" class="space-y-2.5 overflow-y-auto max-h-[170px] pr-1">
+                        <div class="text-center py-6 text-gray-400 text-xs font-semibold" id="emptyCartMsg">
                             Cart is empty. Scan barcode or click items to add.
                         </div>
                     </div>
                 </div>
 
-                <!-- Checkout Calculations -->
-                <div class="pt-3 border-t border-gray-200/80 space-y-2.5 text-xs font-semibold">
+                <!-- Checkout Calculations & Feedback -->
+                <div class="pt-3 border-t border-gray-200/80 space-y-2 text-xs font-semibold">
                     <div class="flex justify-between text-gray-500">
                         <span>Subtotal</span>
                         <span id="cartSubtotal" class="font-extrabold text-gray-900">$0.00</span>
@@ -136,7 +136,22 @@
                         <input type="number" id="discountInput" value="0" min="0" onchange="calculateTotals()" class="w-20 bg-white border-0 py-1 px-2 text-right rounded-xl font-bold text-gray-900 focus:ring-1 focus:ring-[#F05423]">
                     </div>
 
-                    <div class="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-gray-200">
+                    <!-- ORDER RATING & FEEDBACK -->
+                    <div class="bg-white p-2.5 rounded-2xl border border-gray-100 space-y-1.5 my-1">
+                        <div class="flex justify-between items-center text-[11px] font-bold text-gray-700">
+                            <span>Customer Rating</span>
+                            <div class="flex items-center gap-1 cursor-pointer" id="starContainer">
+                                <span onclick="setRating(1)" class="star text-amber-400 text-sm">★</span>
+                                <span onclick="setRating(2)" class="star text-amber-400 text-sm">★</span>
+                                <span onclick="setRating(3)" class="star text-amber-400 text-sm">★</span>
+                                <span onclick="setRating(4)" class="star text-amber-400 text-sm">★</span>
+                                <span onclick="setRating(5)" class="star text-amber-400 text-sm">★</span>
+                            </div>
+                        </div>
+                        <input type="text" id="orderComment" placeholder="Write feedback/notes (optional)..." class="w-full bg-[#F6F7F9] border-0 rounded-xl px-2.5 py-1 text-[11px] font-medium focus:ring-1 focus:ring-[#F05423]">
+                    </div>
+
+                    <div class="flex justify-between text-base font-extrabold text-gray-900 pt-1 border-t border-gray-200">
                         <span>Total Payable</span>
                         <span id="cartTotal" class="text-[#F05423]">$0.00</span>
                     </div>
@@ -144,7 +159,7 @@
                     <div class="grid grid-cols-2 gap-2 pt-1">
                         <div>
                             <label class="block text-[10px] text-gray-400 mb-1">Payment Method</label>
-                            <select id="paymentMethod" class="w-full bg-white border-0 rounded-xl py-2 px-3 text-xs font-bold text-gray-700">
+                            <select id="paymentMethod" class="w-full bg-white border-0 rounded-xl py-1.5 px-3 text-xs font-bold text-gray-700">
                                 <option value="cash">Cash</option>
                                 <option value="card">Card</option>
                                 <option value="kpay">Mobile KPay</option>
@@ -152,11 +167,11 @@
                         </div>
                         <div>
                             <label class="block text-[10px] text-gray-400 mb-1">Paid Amount ($)</label>
-                            <input type="number" id="paidAmount" min="0" onkeyup="calculateTotals()" placeholder="0.00" class="w-full bg-white border-0 rounded-xl py-2 px-3 text-xs font-bold text-gray-900 focus:ring-1 focus:ring-[#F05423]">
+                            <input type="number" id="paidAmount" min="0" onkeyup="calculateTotals()" placeholder="0.00" class="w-full bg-white border-0 rounded-xl py-1.5 px-3 text-xs font-bold text-gray-900 focus:ring-1 focus:ring-[#F05423]">
                         </div>
                     </div>
 
-                    <div class="flex justify-between text-xs font-bold text-gray-700 bg-white p-2.5 rounded-2xl">
+                    <div class="flex justify-between text-xs font-bold text-gray-700 bg-white p-2 rounded-2xl">
                         <span>Change Return:</span>
                         <span id="changeReturn" class="text-emerald-600 font-extrabold">$0.00</span>
                     </div>
@@ -178,6 +193,22 @@
         let selectedCustomer = null;
         let pointsDiscountAmount = 0;
         let redeemedPointsCount = 0;
+        let selectedRating = 5;
+
+        // STAR RATING LOGIC
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.querySelectorAll('#starContainer .star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('text-amber-400');
+                    star.classList.remove('text-gray-300');
+                } else {
+                    star.classList.remove('text-amber-400');
+                    star.classList.add('text-gray-300');
+                }
+            });
+        }
 
         // WEB AUDIO API FOR BEEP SOUND
         function playBeepSound() {
@@ -340,12 +371,12 @@
         function renderCart() {
             const cartContainer = document.getElementById('cartItems');
             if (cart.length === 0) {
-                cartContainer.innerHTML = '<div class="text-center py-8 text-gray-400 text-xs font-semibold" id="emptyCartMsg">Cart is empty. Scan barcode or click items to add.</div>';
+                cartContainer.innerHTML = '<div class="text-center py-6 text-gray-400 text-xs font-semibold" id="emptyCartMsg">Cart is empty. Scan barcode or click items to add.</div>';
             } else {
                 let html = '';
                 cart.forEach(item => {
                     html += `
-                        <div class="bg-white p-2.5 rounded-2xl flex items-center justify-between shadow-sm">
+                        <div class="bg-white p-2 rounded-2xl flex items-center justify-between shadow-sm">
                             <div class="flex-1 pr-2">
                                 <h5 class="font-bold text-xs text-gray-900 line-clamp-1">${item.name}</h5>
                                 <span class="text-[11px] font-extrabold text-[#F05423]">$${(item.price * item.qty).toFixed(2)}</span>
@@ -413,6 +444,7 @@
             const total = Math.max(0, subtotal + tax - totalDiscount);
             const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
             const paymentMethod = document.getElementById('paymentMethod').value;
+            const orderComment = document.getElementById('orderComment').value;
 
             if (paidAmount < total) {
                 alert('Paid amount is less than total payable amount.');
@@ -436,7 +468,9 @@
                     paid_amount: paidAmount,
                     change_return: paidAmount - total,
                     customer_id: selectedCustomer ? selectedCustomer.id : null,
-                    redeemed_points: redeemedPointsCount
+                    redeemed_points: redeemedPointsCount,
+                    rating: selectedRating,
+                    comment: orderComment
                 })
             })
             .then(res => res.json())

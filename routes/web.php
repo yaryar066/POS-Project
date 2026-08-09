@@ -3,8 +3,10 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
@@ -21,22 +23,18 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Welcome Page
 Route::get('/', function () {
     return view('welcome');
 });
 
-// OAuth Social Authentication Routes
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirectToProvider'])
     ->name('social.redirect');
 
 Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])
     ->name('social.callback');
 
-// Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Default Dashboard Redirect
     Route::get('/dashboard', function () {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -55,11 +53,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('users', UserController::class);
 
-        // Sales History & Receipts
+        // Sales History
         Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
         Route::get('/sales/{order}', [SalesController::class, 'show'])->name('sales.show');
 
-        // Sales Analytics & Reports
+        // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/export', [ReportController::class, 'exportCsv'])->name('reports.export');
 
@@ -67,12 +65,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 
-        // Step 15: Customer Loyalty API
+        // Customer Loyalty
         Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
         Route::get('/customers/search', [CustomerController::class, 'search'])->name('customers.search');
+
+        // Expense Tracker
+        Route::resource('expenses', ExpenseController::class)->except(['show', 'edit', 'update']);
+
+        // Reviews & Feedback Module
+        Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
     });
 
-    // Staff / Cashier Terminal Routes
+    // Staff Routes
     Route::middleware(['role:admin,staff'])->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
     });
@@ -81,7 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/pos/checkout', [PosController::class, 'checkout'])->name('pos.checkout');
 
-    // Profile Management Routes
+    // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

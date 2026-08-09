@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +40,8 @@ class PosController extends Controller
             'change_return'  => 'required|numeric',
             'customer_id'    => 'nullable|exists:customers,id',
             'redeemed_points'=> 'nullable|integer|min:0',
+            'rating'         => 'nullable|integer|min:1|max:5',
+            'comment'        => 'nullable|string|max:500',
         ]);
 
         DB::beginTransaction();
@@ -73,7 +76,6 @@ class PosController extends Controller
 
                 $product->decrement('stock', $item['qty']);
 
-                // Create Order Item (Using unit_price matching database schema)
                 OrderItem::create([
                     'order_id'     => $order->id,
                     'product_id'   => $product->id,
@@ -97,6 +99,16 @@ class PosController extends Controller
                         $customer->increment('points', $earnedPoints);
                     }
                 }
+            }
+
+            // Save Rating and Review Comment
+            if ($request->filled('rating') || $request->filled('comment')) {
+                Review::create([
+                    'order_id'    => $order->id,
+                    'customer_id' => $request->customer_id,
+                    'rating'      => $request->rating ?? 5,
+                    'comment'     => $request->comment,
+                ]);
             }
 
             DB::commit();
